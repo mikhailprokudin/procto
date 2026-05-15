@@ -1,7 +1,9 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
+// https://nuxt.com/docs/api/nuxt-config
+const isProd = process.env.NODE_ENV === 'production'
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
-  devtools: { enabled: true },
+  devtools: { enabled: !isProd },
   app: {
     head: {
       link: [
@@ -10,19 +12,24 @@ export default defineNuxtConfig({
         { rel: 'shortcut icon', href: '/favicon.ico' },
         { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
         { rel: 'manifest', href: '/site.webmanifest' },
-        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
         {
-          rel: 'stylesheet',
-          href: 'https://fonts.googleapis.com/css2?family=Onest:wght@700&display=swap'
+          rel: 'preload',
+          href: '/fonts/sbsanstext-medium.woff2',
+          as: 'font',
+          type: 'font/woff2',
+          crossorigin: ''
         }
       ]
     }
   },
   css: ['~/assets/css/main.css'],
-  vite: {
-    optimizeDeps: {
-      include: ['@vue/devtools-core', '@vue/devtools-kit']
-    }
-  }
+  ...(isProd
+    ? {}
+    : {
+        vite: {
+          optimizeDeps: {
+            include: ['@vue/devtools-core', '@vue/devtools-kit']
+          }
+        }
+      })
 })

@@ -12,6 +12,8 @@ const props = withDefaults(
      * Named `mediaSrc` (not `videoSrc`) so the template attr `video-src` is never confused with a native video `src`.
      */
     mediaSrc: string
+    /** Lighter MP4 for narrow viewports (`<48rem`), if provided. */
+    mediaSrcMobile?: string
     /** Still image shown before playback; path under `public/` or absolute URL (`mediaSrc` rules). */
     videoPosterSrc?: string
     /** Use `h3` when a parent section already provides the page `h2`. */
@@ -21,8 +23,10 @@ const props = withDefaults(
      * Mobile always stacks title/description then video.
      */
     desktopMediaFirst?: boolean
+    /** First hero block: hints LCP (`fetchpriority`) and slightly earlier intersection preload. */
+    priorityLcp?: boolean
   }>(),
-  { descriptionIsHtml: false, titleTag: 'h2', desktopMediaFirst: false }
+  { descriptionIsHtml: false, titleTag: 'h2', desktopMediaFirst: false, priorityLcp: false }
 )
 
 const videoRef = ref<HTMLVideoElement | null>(null)
@@ -52,6 +56,20 @@ const videoPosterUrl = computed(() =>
   props.videoPosterSrc ? publicMediaUrl(props.videoPosterSrc) : undefined
 )
 
+/** Resolved file for current viewport (`mediaSrcMobile` under `--bp-md`). */
+function resolvedMediaPath(): string {
+  if (
+    props.mediaSrcMobile &&
+    typeof window !== 'undefined' &&
+    window.matchMedia('(max-width: 47.99rem)').matches
+  ) {
+    return props.mediaSrcMobile
+  }
+  return props.mediaSrc
+}
+
+const observeRootMargin = computed(() => (props.priorityLcp ? '200px' : '0px'))
+
 const { controllerId, registerExternalPause, takePlaybackLock, releasePlaybackLock } =
   useExclusiveVideoPlayback()
 
@@ -64,7 +82,7 @@ function pauseFromExternal() {
 
 function enablePosterPreload() {
   if (clientMediaSrc.value) return
-  clientMediaSrc.value = publicMediaUrl(props.mediaSrc)
+  clientMediaSrc.value = publicMediaUrl(resolvedMediaPath())
   preloadMode.value = 'metadata'
   nextTick(() => videoRef.value?.load())
 }
@@ -104,7 +122,7 @@ onMounted(() => {
       observer.disconnect()
       scheduleAfterPageLoad(enablePosterPreload)
     },
-    { rootMargin: '200px' }
+    { rootMargin: observeRootMargin.value }
   )
   observer.observe(wrap)
   onScopeDispose(() => observer.disconnect())
@@ -113,7 +131,7 @@ onMounted(() => {
 async function startPlayback() {
   const el = videoRef.value
   if (!el) return
-  const targetUrl = publicMediaUrl(props.mediaSrc)
+  const targetUrl = publicMediaUrl(resolvedMediaPath())
   if (clientMediaSrc.value !== targetUrl) {
     clientMediaSrc.value = targetUrl
     await nextTick()
@@ -203,6 +221,7 @@ function onVideoPause() {
         ref="videoRef"
         class="content-video__video"
         :poster="videoPosterUrl"
+        :fetchpriority="priorityLcp ? 'high' : undefined"
         playsinline
         loop
         :preload="preloadMode"

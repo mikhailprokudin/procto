@@ -3,7 +3,15 @@ import { homeSections } from '~/constants/homeSections'
 
 useHead({
   title: 'ПРОКТОБАБОЧКА',
-  meta: [{ name: 'description', content: 'Одностраничный сайт ПРОКТОБАБОЧКА' }]
+  meta: [{ name: 'description', content: 'Одностраничный сайт ПРОКТОБАБОЧКА' }],
+  link: [
+    {
+      rel: 'preload',
+      as: 'image',
+      href: '/media/posters/section-1.webp',
+      fetchpriority: 'high'
+    }
+  ]
 })
 </script>
 
@@ -11,13 +19,15 @@ useHead({
   <div class="page">
     <ContentWithVideo
       v-for="(section, index) in homeSections"
-      :key="section.mediaSrc"
+      :key="index"
       :desktop-media-first="index % 2 === 1"
       :title="section.title"
       :description="section.description"
       :description-is-html="section.descriptionIsHtml"
       :media-src="section.mediaSrc"
+      :media-src-mobile="section.mediaSrcMobile"
       :video-poster-src="section.videoPosterSrc"
+      :priority-lcp="index === 0"
     />
   </div>
 </template>

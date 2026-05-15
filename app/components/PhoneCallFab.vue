@@ -24,6 +24,20 @@ import { primaryPhone } from '~/constants/contacts'
 </template>
 
 <style scoped>
+@keyframes phone-fab-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 4px 14px rgba(195, 45, 105, 0.42);
+  }
+  50% {
+    transform: scale(1.07);
+    box-shadow:
+      0 8px 24px rgba(195, 45, 105, 0.52),
+      0 0 0 3px rgba(195, 45, 105, 0.12);
+  }
+}
+
 .phone-fab {
   position: fixed;
   right: max(var(--space-md), env(safe-area-inset-right));
@@ -39,13 +53,21 @@ import { primaryPhone } from '~/constants/contacts'
   background: var(--color-accent);
   box-shadow: 0 4px 14px rgba(195, 45, 105, 0.45);
   text-decoration: none;
+  animation: phone-fab-pulse 2.4s ease-in-out infinite;
   transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .phone-fab {
+    animation: none;
+  }
 }
 
 .phone-fab:hover {
   background: var(--color-accent-hover);
   color: #fff;
   text-decoration: none;
+  animation: none;
   transform: scale(1.05);
   box-shadow: 0 6px 18px rgba(165, 38, 89, 0.5);
 }
@@ -53,9 +75,11 @@ import { primaryPhone } from '~/constants/contacts'
 .phone-fab:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 3px;
+  animation: none;
 }
 
 .phone-fab:active {
+  animation: none;
   transform: scale(0.98);
 }
 

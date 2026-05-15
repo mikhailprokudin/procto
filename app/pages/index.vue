@@ -10,13 +10,14 @@ useHead({
 <template>
   <div class="page">
     <ContentWithVideo
-      v-for="section in homeSections"
+      v-for="(section, index) in homeSections"
       :key="section.mediaSrc"
+      :desktop-media-first="index % 2 === 1"
       :title="section.title"
       :description="section.description"
       :description-is-html="section.descriptionIsHtml"
       :media-src="section.mediaSrc"
-      :poster-src="section.posterSrc"
+      :video-poster-src="section.videoPosterSrc"
     />
   </div>
 </template>

@@ -12,12 +12,17 @@ const props = withDefaults(
      * Named `mediaSrc` (not `videoSrc`) so the template attr `video-src` is never confused with a native video `src`.
      */
     mediaSrc: string
-    /** Optional poster image, same rules as `mediaSrc` */
-    posterSrc?: string
+    /** Still image shown before playback; path under `public/` or absolute URL (`mediaSrc` rules). */
+    videoPosterSrc?: string
     /** Use `h3` when a parent section already provides the page `h2`. */
     titleTag?: 'h2' | 'h3'
+    /**
+     * Desktop (`≥48rem`): `false` → text | video (`row`). `true` → video | text (`row-reverse`).
+     * Mobile always stacks title/description then video.
+     */
+    desktopMediaFirst?: boolean
   }>(),
-  { descriptionIsHtml: false, titleTag: 'h2' }
+  { descriptionIsHtml: false, titleTag: 'h2', desktopMediaFirst: false }
 )
 
 const videoRef = ref<HTMLVideoElement | null>(null)
@@ -42,6 +47,10 @@ function publicMediaUrl(path: string): string {
   const trimmed = path.replace(/^\//, '')
   return joinURL(runtimeConfig.app.baseURL, trimmed)
 }
+
+const videoPosterUrl = computed(() =>
+  props.videoPosterSrc ? publicMediaUrl(props.videoPosterSrc) : undefined
+)
 
 const { controllerId, registerExternalPause, takePlaybackLock, releasePlaybackLock } =
   useExclusiveVideoPlayback()
@@ -159,22 +168,28 @@ function onVideoPause() {
 </script>
 
 <template>
-  <section class="content-video" :aria-labelledby="`content-video-title-${controllerId}`">
-    <component
-      :is="titleTag"
-      :id="`content-video-title-${controllerId}`"
-      class="content-video__title"
-    >
-      {{ title }}
-    </component>
-    <div
-      v-if="descriptionIsHtml"
-      class="content-video__description"
-      v-html="description"
-    />
-    <p v-else class="content-video__description">
-      {{ description }}
-    </p>
+  <section
+    class="content-video"
+    :class="{ 'content-video--desktop-media-first': desktopMediaFirst }"
+    :aria-labelledby="`content-video-title-${controllerId}`"
+  >
+    <div class="content-video__text">
+      <component
+        :is="titleTag"
+        :id="`content-video-title-${controllerId}`"
+        class="content-video__title"
+      >
+        {{ title }}
+      </component>
+      <div
+        v-if="descriptionIsHtml"
+        class="content-video__description"
+        v-html="description"
+      />
+      <p v-else class="content-video__description">
+        {{ description }}
+      </p>
+    </div>
     <div
       ref="playerWrapRef"
       class="content-video__player-wrap"
@@ -187,7 +202,7 @@ function onVideoPause() {
       <video
         ref="videoRef"
         class="content-video__video"
-        :poster="posterSrc"
+        :poster="videoPosterUrl"
         playsinline
         loop
         :preload="preloadMode"
@@ -210,6 +225,35 @@ function onVideoPause() {
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
+}
+
+.content-video__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  min-width: 0;
+}
+
+@media (min-width: 48rem) {
+  .content-video {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--space-lg);
+  }
+
+  .content-video--desktop-media-first {
+    flex-direction: row-reverse;
+  }
+
+  .content-video__text {
+    flex: 1 1 0;
+  }
+
+  .content-video__player-wrap {
+    flex: 1 1 0;
+    max-width: none;
+    min-width: 0;
+  }
 }
 
 .content-video__title {

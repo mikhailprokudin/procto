@@ -187,9 +187,11 @@ onUnmounted(() => {
 }
 
 .header__logo-text {
+  font-family: 'Onest', var(--font-sans);
   font-weight: 700;
   font-size: clamp(0.8125rem, 3.2vw, 1.0625rem);
   line-height: 1.2;
+  letter-spacing: 0.02em;
 }
 
 .header__logo:hover .header__logo-text {

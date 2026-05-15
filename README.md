@@ -73,3 +73,9 @@ bun run preview
 ```
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+
+TODO: 
+1. Постеры для видео
+2. Сделать cicd
+3. Блок с фото Олега
+4. Nginx конфиг

@@ -29,6 +29,11 @@ useHead({
       :video-poster-src="section.videoPosterSrc"
       :priority-lcp="index === 0"
     />
+    <ContentPortrait
+      class="page__portrait"
+      src="/media/portrait.webp"
+      alt="Портрет врача в тёмно-синих медицинских скрабах"
+    />
   </div>
 </template>
 
@@ -45,7 +50,20 @@ useHead({
   padding: var(--space-lg);
 }
 
-.page > *:nth-child(even) {
+.page > *:nth-child(even):not(.page__portrait) {
   background: rgba(195, 45, 105, 0.112);
+}
+
+.page > .page__portrait {
+  background: transparent;
+}
+
+@media (max-width: 47.99rem) {
+  .page > .page__portrait {
+    width: 100vw;
+    max-width: 100vw;
+    margin-left: calc(50% - 50vw);
+    padding: 0;
+  }
 }
 </style>

@@ -1,15 +1,51 @@
 <script setup lang="ts">
-import { burgerMenuConditionLinks } from '~/constants/burgerMenuLinks'
+import { burgerMenuLinks } from '~/constants/homeSections'
 import { primaryPhone, workingHoursLine } from '~/constants/contacts'
+import { smoothScrollToElement } from '~/utils/smoothScroll'
 
 const menuOpen = ref(false)
+/** Drawer ещё уезжает — держим visibility, чтобы transition был виден. */
+const menuClosing = ref(false)
+const drawerRef = ref<HTMLElement | null>(null)
 
-function toggleMenu() {
-  menuOpen.value = !menuOpen.value
+function openMenu() {
+  menuClosing.value = false
+  menuOpen.value = true
 }
 
 function closeMenu() {
+  const wasOpen = menuOpen.value
   menuOpen.value = false
+  if (wasOpen) menuClosing.value = true
+}
+
+function toggleMenu() {
+  if (menuOpen.value) closeMenu()
+  else openMenu()
+}
+
+function onDrawerTransitionEnd(event: TransitionEvent) {
+  if (event.target !== drawerRef.value || event.propertyName !== 'transform') return
+  menuClosing.value = false
+}
+
+function onMenuSectionClick(event: MouseEvent, href: string) {
+  if (!import.meta.client || !href.startsWith('#')) {
+    closeMenu()
+    return
+  }
+
+  const id = decodeURIComponent(href.slice(1))
+  const target = document.getElementById(id)
+  if (!target) {
+    closeMenu()
+    return
+  }
+
+  event.preventDefault()
+  document.body.style.overflow = ''
+  closeMenu()
+  smoothScrollToElement(target)
 }
 
 watch(menuOpen, (open) => {
@@ -72,20 +108,6 @@ onUnmounted(() => {
         </NuxtLink>
 
         <div class="header__toolbar-icons">
-          <a
-            class="header__icon-btn"
-            href="https://t.me/"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Telegram"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                fill="currentColor"
-                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"
-              />
-            </svg>
-          </a>
           <button
             type="button"
             class="header__icon-btn header__icon-btn--burger"
@@ -116,23 +138,25 @@ onUnmounted(() => {
 
     <nav
       id="site-menu"
+      ref="drawerRef"
       class="header__drawer"
-      :class="{ 'header__drawer--open': menuOpen }"
+      :class="{
+        'header__drawer--open': menuOpen,
+        'header__drawer--closing': menuClosing,
+      }"
       aria-label="Мобильное меню"
+      :aria-hidden="!menuOpen && !menuClosing"
+      @transitionend="onDrawerTransitionEnd"
     >
       <ul class="header__drawer-list">
-        <li v-for="item in burgerMenuConditionLinks" :key="item.label">
+        <li v-for="item in burgerMenuLinks" :key="item.href">
           <a
-            v-if="item.href"
             class="header__drawer-link"
             :href="item.href"
-            @click="closeMenu"
+            @click="onMenuSectionClick($event, item.href)"
           >
             {{ item.label }}
           </a>
-          <span v-else class="header__drawer-link header__drawer-link--pending">
-            {{ item.label }}
-          </span>
         </li>
       </ul>
     </nav>
@@ -359,10 +383,14 @@ onUnmounted(() => {
   visibility: hidden;
 }
 
+.header__drawer--open,
+.header__drawer--closing {
+  visibility: visible;
+}
+
 .header__drawer--open {
   transform: translateX(0);
   pointer-events: auto;
-  visibility: visible;
 }
 
 .header__drawer-list {
@@ -388,11 +416,6 @@ onUnmounted(() => {
 .header__drawer-link:hover {
   color: var(--color-accent);
   text-decoration: none;
-}
-
-.header__drawer-link--pending {
-  cursor: default;
-  color: var(--color-text-muted);
 }
 
 .fade-enter-active,

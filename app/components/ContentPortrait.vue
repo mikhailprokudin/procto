@@ -32,11 +32,4 @@ defineProps<{
   height: auto;
   object-fit: cover;
 }
-
-@media (min-width: 48rem) {
-  .content-portrait {
-    max-width: 28rem;
-    margin-inline: auto;
-  }
-}
 </style>

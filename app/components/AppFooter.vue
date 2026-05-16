@@ -3,7 +3,7 @@ import { phones } from '~/constants/contacts'
 </script>
 
 <template>
-  <footer class="footer">
+  <footer id="contacts" class="footer">
     <div class="footer__inner">
       <p class="footer__title">Телефоны</p>
       <ul class="footer__phones">
@@ -18,6 +18,7 @@ import { phones } from '~/constants/contacts'
 
 <style scoped>
 .footer {
+  scroll-margin-top: 6.5rem;
   flex-shrink: 0;
   margin-top: auto;
   padding: var(--space-xl) var(--space-md);
@@ -71,6 +72,10 @@ import { phones } from '~/constants/contacts'
 }
 
 @media (min-width: 48rem) {
+  .footer {
+    scroll-margin-top: 4.5rem;
+  }
+
   .footer__phone-row {
     flex-direction: row;
     align-items: baseline;

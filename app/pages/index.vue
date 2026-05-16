@@ -19,7 +19,7 @@ useHead({
   <div class="page">
     <ContentWithVideo
       v-for="(section, index) in homeSections"
-      :key="index"
+      :key="section.anchorId ?? `section-${index}`"
       :desktop-media-first="index % 2 === 1"
       :title="section.title"
       :description="section.description"
@@ -28,6 +28,7 @@ useHead({
       :media-src-mobile="section.mediaSrcMobile"
       :video-poster-src="section.videoPosterSrc"
       :priority-lcp="index === 0"
+      :section-id="section.anchorId"
     />
     <ContentPortrait
       class="page__portrait"
@@ -56,6 +57,12 @@ useHead({
 
 .page > .page__portrait {
   background: transparent;
+}
+
+@media (min-width: 48rem) {
+  .page > .page__portrait {
+    display: none;
+  }
 }
 
 @media (max-width: 47.99rem) {

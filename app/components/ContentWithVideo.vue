@@ -25,6 +25,8 @@ const props = withDefaults(
     desktopMediaFirst?: boolean
     /** First hero block: hints LCP (`fetchpriority`) and slightly earlier intersection preload. */
     priorityLcp?: boolean
+    /** Якорь раздела для навигации из меню */
+    sectionId?: string
   }>(),
   { descriptionIsHtml: false, titleTag: 'h2', desktopMediaFirst: false, priorityLcp: false }
 )
@@ -56,7 +58,7 @@ const videoPosterUrl = computed(() =>
   props.videoPosterSrc ? publicMediaUrl(props.videoPosterSrc) : undefined
 )
 
-/** Resolved file for current viewport (`mediaSrcMobile` under `--bp-md`). */
+/** Resolved file for current viewport (`mediaSrcMobile` under 48rem). */
 function resolvedMediaPath(): string {
   if (
     props.mediaSrcMobile &&
@@ -187,6 +189,7 @@ function onVideoPause() {
 
 <template>
   <section
+    :id="sectionId"
     class="content-video"
     :class="{ 'content-video--desktop-media-first': desktopMediaFirst }"
     :aria-labelledby="`content-video-title-${controllerId}`"
@@ -246,6 +249,10 @@ function onVideoPause() {
   gap: var(--space-md);
 }
 
+.content-video[id] {
+  scroll-margin-top: 6.5rem;
+}
+
 .content-video__text {
   display: flex;
   flex-direction: column;
@@ -258,6 +265,10 @@ function onVideoPause() {
     flex-direction: row;
     align-items: flex-start;
     gap: var(--space-lg);
+  }
+
+  .content-video[id] {
+    scroll-margin-top: 4.5rem;
   }
 
   .content-video--desktop-media-first {

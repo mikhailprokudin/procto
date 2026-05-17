@@ -4,8 +4,14 @@ const isProd = process.env.NODE_ENV === 'production'
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: !isProd },
+  runtimeConfig: {
+    public: {
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'https://proctobabochka.ru',
+    },
+  },
   app: {
     head: {
+      htmlAttrs: { lang: 'ru' },
       link: [
         { rel: 'icon', type: 'image/png', href: '/favicon-96x96.png', sizes: '96x96' },
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },

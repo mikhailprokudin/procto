@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { homeSections } from '~/constants/homeSections'
 
+useSiteSeo()
+
 useHead({
-  title: 'ПРОКТОБАБОЧКА',
-  meta: [{ name: 'description', content: 'Одностраничный сайт ПРОКТОБАБОЧКА' }],
   link: [
     {
       rel: 'preload',

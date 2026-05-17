@@ -10,19 +10,9 @@ export interface ClinicPhone {
 export const phones: ClinicPhone[] = [
   {
     label: 'Регистратура',
-    tel: '+74951234567',
-    display: '+7 (495) 123-45-67'
+    tel: '+73832078386',
+    display: '+7(383)207-83-86'
   },
-  {
-    label: 'Экстренная линия',
-    tel: '+74957654321',
-    display: '+7 (495) 765-43-21'
-  },
-  {
-    label: 'Справочная',
-    tel: '+78001234567',
-    display: '8 (800) 123-45-67'
-  }
 ]
 
 export const primaryPhone = phones[0]!

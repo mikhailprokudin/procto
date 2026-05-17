@@ -1,0 +1,74 @@
+# Deploy static site on push to main.
+#
+# GitHub → Settings → Secrets and variables → Actions
+#
+# Secret:
+#   SSH_PRIVATE_KEY — private deploy key (full PEM/OpenSSH, including BEGIN/END lines)
+#
+# Variables:
+#   SSH_HOST      — server IP or hostname (e.g. proctobabochka.ru)
+#   SSH_USER      — SSH user (e.g. deploy)
+#   SSH_PORT      — SSH port (e.g. 22)
+#   DEPLOY_PATH   — target dir on server (e.g. /var/www/proctobabochka/.output/public)
+#
+# Server setup (once): deploy user, authorized_keys with matching public key,
+# writable DEPLOY_PATH, nginx root pointing to the same path.
+
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run generate
+        env:
+          NODE_ENV: production
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: static-site
+          path: .output/public
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: static-site
+          path: site
+
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p "${{ vars.SSH_PORT }}" -H "${{ vars.SSH_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Clear deploy directory
+        run: |
+          ssh -p "${{ vars.SSH_PORT }}" \
+            "${{ vars.SSH_USER }}@${{ vars.SSH_HOST }}" \
+            "rm -rf '${{ vars.DEPLOY_PATH }}'/*"
+
+      - name: Upload static files
+        run: |
+          scp -P "${{ vars.SSH_PORT }}" -r site/. \
+            "${{ vars.SSH_USER }}@${{ vars.SSH_HOST }}:${{ vars.DEPLOY_PATH }}/"

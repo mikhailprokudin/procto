@@ -59,12 +59,6 @@ useHead({
   background: transparent;
 }
 
-@media (min-width: 48rem) {
-  .page > .page__portrait {
-    display: none;
-  }
-}
-
 @media (max-width: 47.99rem) {
   .page > .page__portrait {
     width: 100vw;

@@ -13,6 +13,9 @@ import { phones } from '~/constants/contacts'
         </li>
       </ul>
     </div>
+    <p class="footer__legal">
+      ООО "ЦПМ", Новосибирск, ул. Пирогова, 25/4, корп. А
+    </p>
   </footer>
 </template>
 
@@ -69,6 +72,15 @@ import { phones } from '~/constants/contacts'
 
 .footer__tel:hover {
   text-decoration: underline;
+}
+
+.footer__legal {
+  margin: var(--space-lg) auto 0;
+  max-width: 72rem;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--color-text-muted);
 }
 
 @media (min-width: 48rem) {

@@ -3,6 +3,8 @@ import { burgerMenuLinks } from '~/constants/homeSections'
 import { primaryPhone, workingHoursLine } from '~/constants/contacts'
 import { smoothScrollToElement } from '~/utils/smoothScroll'
 
+const { trackPhoneClick } = useYandexMetrika()
+
 const menuOpen = ref(false)
 /** Drawer ещё уезжает — держим visibility, чтобы transition был виден. */
 const menuClosing = ref(false)
@@ -79,7 +81,7 @@ onUnmounted(() => {
 
         <div class="header__trailing">
           <div class="header__contact">
-            <a class="header__phone" :href="`tel:${primaryPhone.tel}`">
+            <a class="header__phone" :href="`tel:${primaryPhone.tel}`" @click="trackPhoneClick">
               {{ primaryPhone.display }}
             </a>
             <p class="header__hours">{{ workingHoursLine }}</p>

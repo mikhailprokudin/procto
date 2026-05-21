@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { phones } from '~/constants/contacts'
+
+const { trackPhoneClick } = useYandexMetrika()
 </script>
 
 <template>
@@ -9,7 +11,7 @@ import { phones } from '~/constants/contacts'
       <ul class="footer__phones">
         <li v-for="p in phones" :key="p.tel" class="footer__phone-row">
           <span class="footer__label">{{ p.label }}</span>
-          <a class="footer__tel" :href="`tel:${p.tel}`">{{ p.display }}</a>
+          <a class="footer__tel" :href="`tel:${p.tel}`" @click="trackPhoneClick">{{ p.display }}</a>
         </li>
       </ul>
     </div>

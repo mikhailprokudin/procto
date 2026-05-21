@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { primaryPhone } from '~/constants/contacts'
+
+const { trackPhoneClick } = useYandexMetrika()
 </script>
 
 <template>
@@ -7,6 +9,7 @@ import { primaryPhone } from '~/constants/contacts'
     class="phone-fab"
     :href="`tel:${primaryPhone.tel}`"
     :aria-label="`Позвонить: ${primaryPhone.display}`"
+    @click="trackPhoneClick"
   >
     <svg
       class="phone-fab__icon"
